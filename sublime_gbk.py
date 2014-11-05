@@ -43,13 +43,15 @@ class EventListener(sublime_plugin.EventListener):
         gbk2utf8(view)
 
     def on_post_save(self, view):
-        if ".dump" in view.file_name():
+        file_name = view.file_name()
+        if file_name and ".dump" in file_name:
             file_name = view.file_name()[:-5]
             saveWithEncoding(view, file_name)
 
     def on_close(self,view):
-        if ".dump" in view.file_name():
-            os.remove(view.file_name())
+        file_name = view.file_name()
+        if file_name and ".dump" in file_name:
+            os.remove(file_name)
 
 
 class SaveWithGbkCommand(sublime_plugin.TextCommand):
@@ -58,10 +60,10 @@ class SaveWithGbkCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         file_name = self.view.file_name()
 
-        if(not file_name):
+        if not file_name:
             return
 
-        if ".dump" not in self.view.file_name():
+        if ".dump" not in file_name:
             saveWithEncoding(self.view)
             sublime.active_window().run_command('close')
             sublime.active_window().open_file(self.view.file_name())
@@ -74,13 +76,13 @@ class SaveWithUtf8Command(sublime_plugin.TextCommand):
     def run(self, edit):
         file_name = self.view.file_name()
 
-        if(not file_name):
+        if not file_name:
             return
 
-        if ".dump" in self.view.file_name():
+        if ".dump" in file_name:
             file_name = self.view.file_name()[:-5]
             saveWithEncoding(self.view, file_name, 'utf-8')
             sublime.active_window().run_command('close')
-            sublime.active_window().open_file(file_name)
+            sublime.active_window().open_file(self.view.file_name())
         else:
             sublime.active_window().run_command('save')
